@@ -1,0 +1,1 @@
+// vector AR or GARCH for volatility
