@@ -1,4 +1,4 @@
-### An object-oriented Options Pricing library in C++. Efficiently and accurately price call & put Vanilla and Exotic options and their Greeks with advanced Monte Carlo Simulations, Binomial/Trinomial Trees and closed-form Black-Scholes.
+#### An object-oriented Options Pricing library in C++. Efficiently and accurately price call & put Vanilla and Exotic options and their Greeks with advanced Monte Carlo Simulations, Binomial/Trinomial Trees and closed-form Black-Scholes.
 
 ## Running the Pricer
 Build and run the "main.cpp" file, and follow the directions using the command line interface. It will prompt you to create an option by specifying the type of option, and the parameter inputs of the option, and then it will ask for a name to store the option object in memory. After you create it, you can retrieve the option's price, and depending on the type of it, the Greeks as well.
@@ -84,7 +84,6 @@ The key parameters of the tree are:
 - timesteps: The timesteps to discretize the underlying's and option's lifetime as a grid
 
 #### Tree Structure
-
 1. Leisen Reimer tree first makes sure that the timesteps of the option lifetime is **odd**, because an odd number of timesteps ensures that the final time step, which corresponds to the expiration of the option, is even, helping to maintain symmetry in the tree structure.
 2. Calculates d1 & d2 (the moneyness of the option)
 3. Calculates up (pu) and down (pd) probabilities that the option can take for the next step of the grid, using the _Peizer-Pratt inversion_ cumulative distribution function.
@@ -95,4 +94,9 @@ The key parameters of the tree are:
 8. Calculates the delta & gamma Greeks using finite difference ratios from the up & down option and underlying prices of the next steps in the binomial tree
 
 ## Current Limitations of the Library & Possible Future Additions
-
+- Inclusion of Stochastic Volatility 
+  - The current library assumes that options have fixed parameters (like volatility, interest-rate, dividend) through their lifetimes. A Heston Stochastic Volatilty pricer is implemented in the library in the _monteCarlo_europeanOption_heston_ function in the EuropeanOption class in vanilla_options.cpp that uses the _hestonDynamics_ function in utility_function.hpp, but it is currently not used by the pricer because the computation of the Heston model depends on the parameters: long-term variance, mean-reversion rate of the volatility to the long-term variance, volatility of the volatility, and the correlation matrix of the Brownian motion Wiener processes of the underlying price & its volatility. These parameters need to be estimated using the underlying's historical data and using discretization & maximum likelihood estimations, which is currently not supported by the library.
+- Greeks pricing for Exotic Options
+  - The current library isn't able to calculate the Greeks for Exotic options as the Greeks of path-dependent options like Exotics don't have closed-form solutions and have more complex, unique payoff structures. This is currently a huge limitation of the library, as Greeks give crucial insight to an Option's value and behavioural tendencies.
+- Decreasing the variance of the Monte Carlo simulations more
+  - Adding more control variates like vega, rho and theta control variates besides delta and gamma would reduce the variance of the pricer and improve accuracy more, also decreasing the need of using more simulations, potentially reducing computation time.
