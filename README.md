@@ -1,12 +1,12 @@
-#### An object-oriented Options Pricing library in C++. Efficiently and accurately price call & put Vanilla and Exotic options and their Greeks.
+### An object-oriented Options Pricing library in C++. Efficiently and accurately price call & put Vanilla and Exotic options and their Greeks.
 
-### Running the Pricer
+## Running the Pricer
 Build and run the "main.cpp" file, and follow the directions using the command line interface. It will prompt you to create an option by specifying the type of option, and the parameter inputs of the option, and then it will ask for a name to store the option object in memory. After you create it, you can retrieve the option's price, and depending on the type of it, the Greeks as well.
 
-### Types of Options Available
+## Types of Options Available
 The pricer is able to price Vanilla (European and American) and Exotic (Asian, Barrier, Lookback) options using Black Scholes formula, Binomial/Trinomial trees, and Monte Carlo simulations. Pricing Floating Strike options is also available for Asian and Lookback exotic options. Pricing of the Greeks is available for European and American options, either with the Black Scholes Greeks modified for yearly dividends for the former, and with finite difference ratios using the Leisen Reimer binomial tree nodes for the latter.
 
-### Project Structure
+## Project Structure
 | File Name | Description |
 | ---- | ---- |
 | option_class.hpp | Option Class template. Contains "Option" and "Floating Option" parent classes to create, modify, and display various vanilla & exotic options with fixed or floating strikes. Includes getters for input parameters of the underlying, Greeks and the option price, setters for input parameters of the underlying, and a display function used to display the option's qualities in the main file. |
@@ -72,7 +72,7 @@ Key parameters of the simulations are:
   - Aggregates the option payoffs across all simulations, take their average, and discount it back to present value to estimate the option price with: $$\text{Option Price} = e^{-rT} \cdot \frac{1}{N} \cdot \sum_{n=1}^{N} {Payoff_n}$$
   
 ### Leisen-Reimer Binomial Tree American Option Pricer:
-The main pricer of the American option the library uses is the _ls_americanOption_ Leisen Reimer binomial tree function in the AmericanOption class of vanilla_options.cpp file. The reason that it is the preferred pricer of American options is that Leisen Reimer trees require much less timesteps to accurately compute American options compared to other methods, which equates to faster computing of the option price. 
+The main pricer of the American option the library uses is the _ls_americanOption_ Leisen Reimer binomial tree function in the AmericanOption class of vanilla_options.cpp file. The reason that it is the preferred pricer of American options is that Leisen Reimer trees require much less timesteps to accurately compute American options compared to other methods, which equates to faster computing of the option price. Also, Leisen Reimer trees assume that the binomial tree is centered around the option's strike price at its expiration, instead of its underlying price, which in turn makes it more suitable if the user believes that the option's strike price should be the main driver of its price instead of the current underlying.
 
 The key parameters of the tree are:
 - S: Underlying price
@@ -84,8 +84,15 @@ The key parameters of the tree are:
 - timesteps: The timesteps to discretize the underlying's and option's lifetime as a grid
 
 #### Tree Structure
-- Leisen Reimer tree first makes sure that the timesteps of the option lifetime is **odd**, because an odd number of timesteps ensures that the final time step, which corresponds to the expiration of the option, is even, helping to maintain symmetry in the tree structure.
-- 
 
+1. Leisen Reimer tree first makes sure that the timesteps of the option lifetime is **odd**, because an odd number of timesteps ensures that the final time step, which corresponds to the expiration of the option, is even, helping to maintain symmetry in the tree structure.
+2. Calculates d1 & d2 (the moneyness of the option)
+3. Calculates up (pu) and down (pd) probabilities that the option can take for the next step of the grid, using the _Peizer-Pratt inversion_ cumulative distribution function.
+4. Calculates the magnitude of the up and down movements using the rate of the probabilities of these movements over each other.
+5. Calculates the possible values the underlying can take depending on the up & down moves
+6. Calculates the final payoffs of the option at the end of its life.
+7. Calculates the payoffs of the previous steps by stepping back through the tree grid from the final payoffs, and finds the initial value of the payoff
+8. Calculates the delta & gamma Greeks using finite difference ratios from the up & down option and underlying prices of the next steps in the binomial tree
 
+## Current Limitations of the Library & Possible Future Additions
 
