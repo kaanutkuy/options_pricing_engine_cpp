@@ -14,3 +14,32 @@ The pricer is able to price Vanilla (European and American) and Exotic (Asian, B
 | vanilla_options.cpp | Holds the European and American option classes that inherit from the parent Option class. Includes functions to price the options and its Greeks, specifically, a Black-Scholes pricer modified for yearly dividend returns, Monte Carlo simulation pricers for constant and stochastic volatility that use antithetic and delta,gamma control variates, Greeks calculation function for European options, and Leisen-Reimer binomial-tree pricer, Cox-Ross-Rubinstein trinomial-tree pricer, and Greeks calculation function for American options.|
 | exotic_options.cpp | Holds the Asian, Lookback and Barrier exotic options that inherit from parent Option and Floating-strike option classes. Includes functions to price the options, all using Monte Carlo simulations. |
 | main.cpp | Main file to run the program on. Contains functions for a user to interact with the command-line-interface, create and price available options. Can be modified for different capabilities by calling the various functions of the pricers. | 
+
+## Pricers' Functionalities
+### Black-Scholes European Option Pricer:
+The _blackScholes_europeanOption_ function in the EuropeanOption class in vanilla_options.cpp calculates the price of a European option (call or put) using the Black-Scholes formula, incorporating dividends. The function calculates the price of the option by:
+
+- For Call Options:
+  C = $e^{-rT} \left( S e^{(r - q)T} N(d1) - K N(d2) \right)$
+- For Put Options:
+  P = $e^{-rT} \left( K N(-d2) - S e^{(r - q)T} N(-d1) \right)$
+
+where:
+- S: Underlying price
+- K: Strike price
+- T: Time to expiry in years
+- r: Risk-free rate
+- σ: Volatility
+- q: Yearly Dividend rate
+
+and _N(x)_ is the cumulative distribution function of the standard normal distribution that represents the probability the option will expire in-the-money, d1 = $\frac{\ln\left(\frac{S}{K}\right) + (r - q + 0.5\sigma^2)T}{\sigma \sqrt{T}}$ and d2 = $\frac{\ln\left(\frac{S}{K}\right) + (r - q - 0.5\sigma^2)T}{\sigma \sqrt{T}}$ represent the "moneyness" of the option where d1 is how many standard deviations the log of the price ratio $S/K$ is from the option's payoff at expiration adjusted for the risk-free rate and dividends and d2 adjusts d1 down to reflect the drift rate of the stock under the risk-neutral measure.
+
+
+### Monte Carlo Simulations for Exotic & European Options:
+
+### Leisen-Reimer Binomial Tree American Option Pricer:
+
+### Cox-Ross-Rubinstein Trinomial Tree American Option Pricer:
+
+
+
