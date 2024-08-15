@@ -10,25 +10,25 @@ using namespace std;
 namespace UtilityFunctions {
     
     // probability density function for the standard normal distribution
-    double pdf(double x) {
+    inline double pdf(double x) {
         return (1.0/sqrt(2.0 * M_PI)) * exp(-0.5 * x * x);
     }
 
     // cumulative density function for the standard normal distribution
-    double cdf(double x) {
+    inline double cdf(double x) {
         return 0.5 * (1 + erf(x / sqrt(2.0)));
     }
 
-    double d1_(double S, double K, double T, double r, double sig, double dividend) {
+    inline double d1_(double S, double K, double T, double r, double sig, double dividend) {
         return (log(S/K) + T*(r - dividend + (0.5 * sig * sig))) / (sig * sqrt(T));
     }
 
-    double d2_(double S, double K, double T, double r, double sig, double dividend) {
+    inline double d2_(double S, double K, double T, double r, double sig, double dividend) {
         return (log(S/K) + T*(r - dividend - (0.5 * sig * sig))) / (sig * sqrt(T));
     }
 
     // sensitivity to change in the price of underlying (dC/dS)
-    double delta(double S, double K, double r, double q, double sig, double T, bool callOption) {
+    inline double delta(double S, double K, double r, double q, double sig, double T, bool callOption) {
         double d1 = d1_(S, K, T, r, sig, q);
 
         if (callOption) {
@@ -38,19 +38,19 @@ namespace UtilityFunctions {
     }
 
     // sensitivity to a change in delta (change in the change in underlying price) (d^2C/dS^2)
-    double gamma(double S, double K, double r, double q, double sig, double T, bool callOption) {
+    inline double gamma(double S, double K, double r, double q, double sig, double T, bool callOption) {
         double d1 = d1_(S, K, T, r, sig, q);
         return exp(-q * T) * pdf(d1) / (sig * S * sqrt(T));
     }
 
     // sensitivity to change in volatility (dC/dv)
-    double vega(double S, double K, double r, double q, double sig, double T, bool callOption) {
+    inline double vega(double S, double K, double r, double q, double sig, double T, bool callOption) {
         double d1 = d1_(S, K, T, r, sig, q);
         return exp(-q * T) * S * sqrt(T) * pdf(d1);
     }
 
     // sensitivity to change in time (dC/dt)
-    double theta(double S, double K, double r, double q, double sig, double T, bool callOption) {
+    inline double theta(double S, double K, double r, double q, double sig, double T, bool callOption) {
         double d1 = d1_(S, K, T, r, sig, q);
         double d2 = d2_(S, K, T, r, sig, q);
 
@@ -61,7 +61,7 @@ namespace UtilityFunctions {
     }
 
     // sensitivity to change in risk-free interest rate (dC/dr)
-    double rho(double S, double K, double r, double q, double sig, double T, bool callOption) {
+    inline double rho(double S, double K, double r, double q, double sig, double T, bool callOption) {
         double d2 = d2_(S, K, T, r, sig, q);
 
         if (callOption) {
@@ -71,7 +71,7 @@ namespace UtilityFunctions {
     }
 
     // sign function
-    double sign(double number) {
+    inline double sign(double number) {
         if (number < 0) {
             return -1;
         }
@@ -81,7 +81,7 @@ namespace UtilityFunctions {
         return 0;
     }
 
-    double peizer_pratt_cdf(double number, double N) {
+    inline double peizer_pratt_cdf(double number, double N) {
         double term = pow((number / (N + 1.0/3.0 + 0.1/(N+1))), 2) * (N + 1.0/6.0);
         return 0.5 + 0.5 * sign(number) * sqrt(1 - exp(-term));
     }
@@ -89,7 +89,7 @@ namespace UtilityFunctions {
     // Heston model, updates the volatility and underlying price changes during path iterations
     // NOTE: Not available currently, needs historical data investigation & the use of discretization
     // and maximum likelihood estimation to estimate the parameters (kappa, theta, sigma, rho)
-    void hestonDynamics(double& underlyingCurrent, double& volatilityCurrent, double riskFreeRate, double dividendRate, double kappa, double theta, double sigma, double rho, double dt, double z1, double z2) {
+    inline void hestonDynamics(double& underlyingCurrent, double& volatilityCurrent, double riskFreeRate, double dividendRate, double kappa, double theta, double sigma, double rho, double dt, double z1, double z2) {
         double dWt = sqrt(dt) * z1;
         double dZt = sqrt(dt) * (rho * z1 + sqrt(1 - rho * rho) * z2); 
     
@@ -99,7 +99,7 @@ namespace UtilityFunctions {
         underlyingCurrent *= exp((riskFreeRate - dividendRate - 0.5 * volatilityCurrent) * dt + sqrt(volatilityCurrent) * (rho * dWt + sqrt(1 - rho * rho) * dZt));
     }
 
-    double lr_americanOption_forGreeks(double St, double K, double T, double r, double sig, double dividend, int N, bool callOption) {
+    inline double lr_americanOption_forGreeks(double St, double K, double T, double r, double sig, double dividend, int N, bool callOption) {
         if (N % 2 == 0) {  // use odd time-steps for correct convergence 
             N += 1;
         }
